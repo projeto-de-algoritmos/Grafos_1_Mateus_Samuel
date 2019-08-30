@@ -3,6 +3,7 @@
 #include <utility>
 #include <queue>
 #include <cstdio>
+#include <string>
 
 #define X_MAX 1005
 #define Y_MAX 1005
@@ -22,7 +23,7 @@ bool is_valid(int i, int j, int n, int m)
 }
 
 int solve(
-		const std::vector<std::vector<int>> &tab,
+		const std::vector<std::string> &tab,
 		const std::pair<int, int> & start, 
 		const std::pair<int, int> & end, 
 		int n, int m)
@@ -38,34 +39,34 @@ int solve(
 
 	while (not q.empty())
 	{
-		std::pair<int, int> u = q.front().first;
-		int nops = q.front().second;
+		std::pair<int, int> v = q.front().first;
+		int no_of_steps = q.front().second;
 		q.pop();
 
-		if (u == end)
-			return nops;
+		if (v == end) // if the current node in the queue is the end, return the number of moves
+			return no_of_steps;
 
 
-		std::vector<std::pair<int, int>> adj;
+		std::vector<std::pair<int, int>> adj; //adjacent cells of the current node in the queue
 
-		if (is_valid(u.first, u.second + 1, n, m) and tab[u.first][u.second + 1] > 0)
-			adj.push_back({u.first, u.second + 1});
+		if (is_valid(v.first, v.second + 1, n, m) and tab[v.first][v.second + 1] != '#') //checks if moving UP is valid
+			adj.push_back({v.first, v.second + 1});
 
-		if (is_valid(u.first, u.second - 1, n, m) and tab[u.first][u.second - 1] > 0)
-			adj.push_back({u.first, u.second - 1});
+		if (is_valid(v.first, v.second - 1, n, m) and tab[v.first][v.second - 1] != '#') //checks if moving DOWN is valid
+			adj.push_back({v.first, v.second - 1});
 
-		if (is_valid(u.first + 1, u.second, n, m) and tab[u.first + 1][u.second] > 0)
-			adj.push_back({u.first + 1, u.second});
+		if (is_valid(v.first + 1, v.second, n, m) and tab[v.first + 1][v.second] != '#') //checks if moving RIGHT is valid
+			adj.push_back({v.first + 1, v.second});
 
-		if (is_valid(u.first - 1, u.second, n, m) and tab[u.first - 1][u.second] > 0)
-			adj.push_back({u.first - 1, u.second});
+		if (is_valid(v.first - 1, v.second, n, m) and tab[v.first - 1][v.second] != '#') //checks if moving LEFT is valid
+			adj.push_back({v.first - 1, v.second});
 
 		for (auto p : adj)
 		{
 			if (not visited[p.first][p.second])
 			{
 				visited[p.first][p.second] = 1;
-				q.push({p, nops+1});
+				q.push({p, no_of_steps+1});
 			}
 		}
 	}
@@ -80,19 +81,17 @@ int main() {
 	std::cin >> n >> m;
 
 	std::pair<int, int> start, end;
-	std::vector<std::vector<int>> tab(n, std::vector<int>(m));
-	
-	//TODO: Use char instead of int
+	std::vector<std::string> tab(n, std::string(m, '#'));
 	
 	for (int i = 0; i < n; i++)
 		for (int j = 0; j < m; j++)
 		{
 			std::cin >> tab[i][j];
 
-			if (tab[i][j] == 2)
+			if (tab[i][j] == 'S')
 				start = std::make_pair(i, j);
 			
-			if (tab[i][j] == 3)
+			if (tab[i][j] == 'E')
 				end = std::make_pair(i, j);
 		}
 
