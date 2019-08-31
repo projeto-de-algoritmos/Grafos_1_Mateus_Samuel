@@ -4,9 +4,14 @@
 #include <queue>
 #include <cstdio>
 #include <string>
+#include <map>
 
 #define X_MAX 1005
 #define Y_MAX 1005
+
+#define WALL_CHAR '#'
+#define PATH_CHAR '.'
+#define SPATH_CHAR '-'
 
 bool visited[X_MAX][Y_MAX];
 
@@ -22,15 +27,16 @@ bool is_valid(int i, int j, int n, int m)
 	return true;
 }
 
-int solve(
-		const std::vector<std::string> &tab,
+int bfs(
+		const std::vector<std::string> &matrix,
 		const std::pair<int, int> & start, 
 		const std::pair<int, int> & end, 
+		std::map<std::pair<int, int>, std::pair<int, int>> & previous,
 		int n, int m)
 {
 	/*  pair of a coordinate and the number of moves until that point
 	 *  example: {{1, 2}, 4} means that 4 steps were necessary to reach the
-	 *  coordinate [1,2]
+	 *  coordinate [1,2] from a given starting point
 	 */
 	std::queue<std::pair<std::pair<int, int>, int>> q; 
 
@@ -49,23 +55,24 @@ int solve(
 
 		std::vector<std::pair<int, int>> adj; //adjacent cells of the current node in the queue
 
-		if (is_valid(v.first, v.second + 1, n, m) and tab[v.first][v.second + 1] != '#') //checks if moving UP is valid
+		if (is_valid(v.first, v.second + 1, n, m) and matrix[v.first][v.second + 1] != WALL_CHAR) //checks if moving UP is valid
 			adj.push_back({v.first, v.second + 1});
 
-		if (is_valid(v.first, v.second - 1, n, m) and tab[v.first][v.second - 1] != '#') //checks if moving DOWN is valid
+		if (is_valid(v.first, v.second - 1, n, m) and matrix[v.first][v.second - 1] != WALL_CHAR) //checks if moving DOWN is valid
 			adj.push_back({v.first, v.second - 1});
 
-		if (is_valid(v.first + 1, v.second, n, m) and tab[v.first + 1][v.second] != '#') //checks if moving RIGHT is valid
+		if (is_valid(v.first + 1, v.second, n, m) and matrix[v.first + 1][v.second] != WALL_CHAR) //checks if moving RIGHT is valid
 			adj.push_back({v.first + 1, v.second});
 
-		if (is_valid(v.first - 1, v.second, n, m) and tab[v.first - 1][v.second] != '#') //checks if moving LEFT is valid
+		if (is_valid(v.first - 1, v.second, n, m) and matrix[v.first - 1][v.second] != WALL_CHAR) //checks if moving LEFT is valid
 			adj.push_back({v.first - 1, v.second});
 
 		for (auto p : adj)
 		{
 			if (not visited[p.first][p.second])
 			{
-				visited[p.first][p.second] = 1;
+				visited[p.first][p.second] = true;
+				previous[p] = v;
 				q.push({p, no_of_steps+1});
 			}
 		}
@@ -74,31 +81,64 @@ int solve(
 	return -1;
 }
 
+void add_shortest_path_to_matrix(
+		std::vector<std::string> &matrix,
+		std::map<std::pair<int, int>, std::pair<int, int>> previous,
+		const std::pair<int, int> & start,
+		const std::pair<int, int> & end)
+{
+	std::pair<int, int> aux = previous[end];
+
+	while (aux != start)
+	{
+		matrix[aux.first][aux.second] = SPATH_CHAR;
+		aux = previous[aux];
+	}
+
+}
+
+
+void print_matrix(const std::vector<std::string> &matrix)
+{
+	for (auto line : matrix)
+		std::cout << line << "\n";
+
+	std::cout << "\n";
+}
+
 int main() {
 	std::freopen("map.txt", "r", stdin);
 
 	int n, m; 
-	std::cin >> n >> m;
+	std::cin >> n >> m; //matrix dimensions
 
-	std::pair<int, int> start, end;
-	std::vector<std::string> tab(n, std::string(m, '#'));
+	std::pair<int, int> start, end; // pair of coordinates of the starting point and ending point
+	std::vector<std::string> matrix(n, std::string(m, '#')); // our map
+	std::map<std::pair<int, int>, std::pair<int, int>> previous; // dict to track a node's parent
 	
 	for (int i = 0; i < n; i++)
 		for (int j = 0; j < m; j++)
 		{
-			std::cin >> tab[i][j];
+			std::cin >> matrix[i][j];
 
-			if (tab[i][j] == 'S')
+			if (matrix[i][j] == 'S')
 				start = std::make_pair(i, j);
 			
-			if (tab[i][j] == 'E')
+			if (matrix[i][j] == 'E')
 				end = std::make_pair(i, j);
 		}
 
-	int no_of_steps = solve(tab, start, end, n, m);
+	int no_of_steps = bfs(matrix, start, end, previous, n, m);
 
 	if (no_of_steps != -1)
+	{
 		std::cout << "Menor quantidade de movimentos necessarios para chegar ao fim: " << no_of_steps << "\n";
+		
+		add_shortest_path_to_matrix(matrix, previous, start, end);
+
+		std::cout << "Caminho necessario, marcado com \'" << SPATH_CHAR << "\':\n";
+		print_matrix(matrix);
+	}
 	else
 		std::cout << "Nao ha caminho valido\n";
     
