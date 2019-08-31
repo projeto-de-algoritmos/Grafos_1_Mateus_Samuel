@@ -106,8 +106,15 @@ void print_matrix(const std::vector<std::string> &matrix)
 	std::cout << "\n";
 }
 
-int main() {
-	std::freopen("map.txt", "r", stdin);
+int main(int argc, char **argv) 
+{
+	if (argv[1] == nullptr)
+	{
+		std::cout << "Especifique um arquivo!\n";
+		return 1;
+	}
+
+	std::freopen(argv[1], "r", stdin);
 
 	int n, m; 
 	std::cin >> n >> m; //matrix dimensions
@@ -136,7 +143,7 @@ int main() {
 		
 		add_shortest_path_to_matrix(matrix, previous, start, end);
 
-		std::cout << "Caminho necessario, marcado com \'" << SPATH_CHAR << "\':\n";
+		std::cout << "Caminho necessario, marcado com \'" << SPATH_CHAR << "\':\n\n";
 		print_matrix(matrix);
 	}
 	else
