@@ -1,10 +1,11 @@
 from mazelib import Maze
 from mazelib.generate.BacktrackingGenerator import BacktrackingGenerator
 
+from sys import argv
 
 def main():
-    x = 5
-    y = 20
+    x = int(argv[1])
+    y = int(argv[2])
     maze = Maze()
     maze.generator = BacktrackingGenerator(x, y)
     maze.generate()

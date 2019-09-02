@@ -27,6 +27,12 @@ bool is_valid(int i, int j, int n, int m)
 	return true;
 }
 
+
+bool is_valid_char(char c)
+{
+	return c == 'S' || c == 'E' || c == PATH_CHAR;
+}
+
 int bfs(
 		const std::vector<std::string> &matrix,
 		const std::pair<int, int> & start, 
@@ -55,16 +61,16 @@ int bfs(
 
 		std::vector<std::pair<int, int>> adj; //adjacent cells of the current node in the queue
 
-		if (is_valid(v.first, v.second + 1, n, m) and matrix[v.first][v.second + 1] != WALL_CHAR) //checks if moving UP is valid
+		if (is_valid(v.first, v.second + 1, n, m) and is_valid_char(matrix[v.first][v.second + 1])) //checks if moving UP is valid
 			adj.push_back({v.first, v.second + 1});
 
-		if (is_valid(v.first, v.second - 1, n, m) and matrix[v.first][v.second - 1] != WALL_CHAR) //checks if moving DOWN is valid
+		if (is_valid(v.first, v.second - 1, n, m) and is_valid_char(matrix[v.first][v.second + 1])) //checks if moving DOWN is valid
 			adj.push_back({v.first, v.second - 1});
 
-		if (is_valid(v.first + 1, v.second, n, m) and matrix[v.first + 1][v.second] != WALL_CHAR) //checks if moving RIGHT is valid
+		if (is_valid(v.first + 1, v.second, n, m) and is_valid_char(matrix[v.first][v.second + 1])) //checks if moving RIGHT is valid
 			adj.push_back({v.first + 1, v.second});
 
-		if (is_valid(v.first - 1, v.second, n, m) and matrix[v.first - 1][v.second] != WALL_CHAR) //checks if moving LEFT is valid
+		if (is_valid(v.first - 1, v.second, n, m) and is_valid_char(matrix[v.first][v.second + 1])) //checks if moving LEFT is valid
 			adj.push_back({v.first - 1, v.second});
 
 		for (auto p : adj)
