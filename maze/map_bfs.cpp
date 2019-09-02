@@ -10,8 +10,8 @@
 #define Y_MAX 1005
 
 #define WALL_CHAR '#'
-#define PATH_CHAR '.'
-#define SPATH_CHAR '-'
+#define PATH_CHAR ' '
+#define SPATH_CHAR '*'
 
 bool visited[X_MAX][Y_MAX];
 
@@ -118,22 +118,24 @@ int main(int argc, char **argv)
 
 	int n, m; 
 	std::cin >> n >> m; //matrix dimensions
+	std::cin.ignore();
 
 	std::pair<int, int> start, end; // pair of coordinates of the starting point and ending point
 	std::vector<std::string> matrix(n, std::string(m, '#')); // our map
 	std::map<std::pair<int, int>, std::pair<int, int>> previous; // dict to track a node's parent
 	
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < n; i++) 
+	{
+		std::getline(std::cin, matrix[i]);
 		for (int j = 0; j < m; j++)
 		{
-			std::cin >> matrix[i][j];
-
 			if (matrix[i][j] == 'S')
 				start = std::make_pair(i, j);
 			
 			if (matrix[i][j] == 'E')
 				end = std::make_pair(i, j);
 		}
+	}
 
 	int no_of_steps = bfs(matrix, start, end, previous, n, m);
 
